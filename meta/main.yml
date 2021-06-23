@@ -1,6 +1,6 @@
 galaxy_info:
   author: Lars Kiesow
-  role_name: opencast_user
+  role_name: opencast_postgresql
   namespace: lkiesow
   description: Install and prepare PostgreSQL for Opencast
   license: BSD-3-Clause
