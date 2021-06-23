@@ -11,4 +11,7 @@ galaxy_info:
     - name: EL
       versions:
         - 8
-dependencies: []
+
+dependencies:
+  - community.postgresql.postgresql_db
+  - community.postgresql.postgresql_user
