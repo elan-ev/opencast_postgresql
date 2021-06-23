@@ -1,0 +1,49 @@
+---
+
+- name: install postgresql
+  dnf:
+    name:
+      - '@postgresql:{{ opencast_postgresql_version }}/server'
+      - '@postgresql:{{ opencast_postgresql_version }}/client'
+      - python3-psycopg2
+    state: present
+
+- name: initialize database
+  command:
+    cmd: postgresql-setup --initdb
+    creates: /var/lib/pgsql/data/postgresql.conf
+
+- name: set auth to scram-sha-256
+  lineinfile:
+    path: /var/lib/pgsql/data/postgresql.conf
+    regexp: '^password_encryption'
+    line: "password_encryption = 'scram-sha-256'"
+  notify: restart postgresql
+
+- name: configure postgres access
+  template:
+    src: pg_hba.conf
+    dest: /var/lib/pgsql/data/pg_hba.conf
+    owner: postgres
+    group: postgres
+    mode: '0644'
+  notify: restart postgresql
+
+- name: start and enable postgresql
+  service:
+    name: postgresql
+    state: started
+    enabled: true
+
+- name: create postgresql user
+  become_user: postgres
+  community.postgresql.postgresql_user:
+    name: '{{ opencast_postgresql_user }}'
+    password: '{{ opencast_postgresql_password }}'
+
+- name: create database
+  become: true
+  become_user: postgres
+  community.postgresql.postgresql_db:
+    name: '{{ opencast_postgresql_database }}'
+    owner: '{{ opencast_postgresql_user }}'

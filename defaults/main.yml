@@ -1,0 +1,8 @@
+---
+
+opencast_postgresql_version: 12
+opencast_postgresql_user: opencast
+opencast_postgresql_database: opencast
+opencast_postgresql_connection_hosts:
+  - 127.0.0.1/32
+  - ::1/128
