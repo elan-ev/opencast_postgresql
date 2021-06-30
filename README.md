@@ -4,6 +4,16 @@ Ansible: Opencast PostgreSQL Role
 This Ansible role installs and prepares a PostgreSQL database server for Opencast.
 
 
+Dependencies
+------------
+
+This role requires the PostgreSQL community collection:
+
+```
+ansible-galaxy collection install community.postgresql
+```
+
+
 Role Variables
 --------------
 
