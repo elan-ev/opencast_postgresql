@@ -39,6 +39,6 @@ Example of how to configure and use the role:
 - hosts: servers
   become: true
   roles:
-    - role: lkiesow.opencast_postgresql
+    - role: elan.opencast_postgresql
       opencast_postgresql_password: secret
 ```
