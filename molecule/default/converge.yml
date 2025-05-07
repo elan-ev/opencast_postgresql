@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include opencast_postgresql"
+      ansible.builtin.include_role:
+        name: opencast_postgresql
