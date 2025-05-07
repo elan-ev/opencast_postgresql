@@ -1,0 +1,52 @@
+---
+- name: Verify PostgreSQL Installation
+  hosts: all
+  gather_facts: true
+  vars_files:
+    - ../../defaults/main.yml 
+  tasks:
+    - name: Ensure PostgreSQL service is running on RedHat/CentOS
+      ansible.builtin.systemd:
+        name: "postgresql-{{ opencast_postgresql_version }}"
+        state: started
+      when: ansible_os_family == "RedHat"
+
+    - name: Ensure PostgreSQL service is running on Debian/Ubuntu
+      ansible.builtin.systemd:
+        name: "postgresql"
+        state: started
+      when: ansible_os_family == "Debian"
+
+    - name: Check if PostgreSQL service is active on RedHat/CentOS
+      ansible.builtin.command: "systemctl is-active postgresql-{{ opencast_postgresql_version }}"
+      register: status_rhel
+      changed_when: false
+      when: ansible_os_family == "RedHat"
+
+    - name: Check if PostgreSQL service is active on Debian/Ubuntu
+      ansible.builtin.command: "systemctl is-active postgresql"
+      register: status_debian
+      changed_when: false
+      when: ansible_facts.os_family == "Debian"
+
+    - name: Check psql version on RedHat/CentOS
+      ansible.builtin.command: "/usr/pgsql-{{ opencast_postgresql_version }}/bin/psql --version"
+      register: psql_version_centos
+      changed_when: false
+      when: ansible_os_family == "RedHat"
+
+    - name: Check psql version on Debian/Ubuntu
+      ansible.builtin.command: "psql --version"
+      register: psql_version_debian
+      changed_when: false
+      when: ansible_os_family == "Debian"
+
+    - name: Show PostgreSQL version on RedHat/CentOS
+      debug:
+        msg: "PostgreSQL version on {{ inventory_hostname }} (RedHat): {{ psql_version_centos.stdout }}"
+      when: ansible_os_family == "RedHat"
+
+    - name: Show PostgreSQL version on Debian/Ubuntu
+      debug:
+        msg: "PostgreSQL version on {{ inventory_hostname }} (Debian): {{ psql_version_debian.stdout }}"
+      when: ansible_os_family == "Debian"

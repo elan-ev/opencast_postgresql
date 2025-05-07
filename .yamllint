@@ -1,0 +1,8 @@
+---
+# Yamllint configuration should be compatible with Ansible,
+# see https://ansible.readthedocs.io/projects/lint/rules/yaml/#yamllint-configuration
+
+extends: default
+rules:
+  line-length:
+    max: 200
