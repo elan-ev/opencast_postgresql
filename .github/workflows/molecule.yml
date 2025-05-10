@@ -17,6 +17,6 @@ jobs:
         run: pip3 install -r .dev_requirements.txt
 
       - name: Test playbook
-        run: molecule test
+        run: molecule test -- -e opencast_postgresql_password=123
         env:
           PY_COLORS: '1'

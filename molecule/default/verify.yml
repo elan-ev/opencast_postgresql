@@ -18,25 +18,13 @@
         state: started
       when: ansible_os_family == "Debian"
 
-    - name: Check if PostgreSQL service is active on RedHat/CentOS
-      ansible.builtin.command: "systemctl is-active postgresql-{{ opencast_postgresql_version }}"
-      register: status_rhel
-      changed_when: false
-      when: ansible_os_family == "RedHat"
-
-    - name: Check if PostgreSQL service is active on Debian/Ubuntu
-      ansible.builtin.command: systemctl is-active postgresql
-      register: status_debian
-      changed_when: false
-      when: ansible_os_family == "Debian"
-
-    - name: Check psql version on RedHat/CentOS
+    - name: Get PostgreSQL version on RedHat/CentOS
       ansible.builtin.command: "/usr/pgsql-{{ opencast_postgresql_version }}/bin/psql --version"
       register: psql_version_centos
       changed_when: false
       when: ansible_os_family == "RedHat"
 
-    - name: Check psql version on Debian/Ubuntu
+    - name: Get PostgreSQL version on Debian/Ubuntu
       ansible.builtin.command: psql --version
       register: psql_version_debian
       changed_when: false
