@@ -1,0 +1,8 @@
+---
+# .ansible-lint
+exclude_paths:
+  - .cache/
+  - .github/
+  - venv/
+  - .ansible/
+  

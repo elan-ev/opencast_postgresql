@@ -1,0 +1,12 @@
+---
+# yamllint configuration compatible with ansible-lint
+extends: default
+
+rules:
+  line-length:
+    max: 200
+
+ignore: |
+  .cache/
+  .github/
+  venv/

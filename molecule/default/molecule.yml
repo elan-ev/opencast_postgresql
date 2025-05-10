@@ -1,0 +1,52 @@
+---
+dependency:
+  name: galaxy
+  enabled: false
+
+driver:
+  name: containers
+
+platforms:
+  - name: opencast-postgresql-centos9
+    image: quay.io/centos/centos:stream9
+    pre_build_image: false
+    command: /sbin/init
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - /run
+      - /run/lock
+    cgroupns_mode: host
+
+  - name: opencast-postgresql-debian
+    image: docker.io/debian:latest
+    pre_build_image: false
+    command: /sbin/init
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - /run
+      - /run/lock
+    cgroupns_mode: host
+
+  - name: opencast-postgresql-ubuntu
+    image: docker.io/ubuntu:latest
+    pre_build_image: false
+    command: /sbin/init
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - /run
+      - /run/lock
+    cgroupns_mode: host
+
+lint: |
+  set -e
+  yamllint -c .yamllint .
+  ansible-lint
+
+provisioner:
+  name: ansible
+
+verifier:
+  name: ansible
