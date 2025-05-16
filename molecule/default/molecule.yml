@@ -11,35 +11,30 @@ platforms:
     pre_build_image: false
     command: /sbin/init
     tmpfs:
-      - "/tmp:exec"
-      - "/run:rw,noexec,nosuid,nodev"
+      "/tmp": "exec"
+      "/run": "rw,noexec,nosuid,nodev"
     volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
-    cgroupns_mode: host
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
 
   - name: opencast-postgresql-debian
     image: docker.io/debian:latest
     pre_build_image: false
     command: /sbin/init
-    privileged: true
     tmpfs:
-      - "/tmp:exec"
-      - "/run:rw,noexec,nosuid,nodev"
+      "/tmp": "exec"
+      "/run": "rw,noexec,nosuid,nodev"
     volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
-    cgroupns_mode: host
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
 
   - name: opencast-postgresql-ubuntu
     image: docker.io/ubuntu:latest
     pre_build_image: false
     command: /sbin/init
-    privileged: true
     tmpfs:
-      - "/tmp:exec"
-      - "/run:rw,noexec,nosuid,nodev"
+      "/tmp": "exec"
+      "/run": "rw,noexec,nosuid,nodev"
     volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
-    cgroupns_mode: host
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
 
 lint: |
   set -e
