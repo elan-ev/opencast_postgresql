@@ -1,6 +1,6 @@
 ---
 
-opencast_postgresql_version: 12
+opencast_postgresql_version: 16
 opencast_postgresql_user: opencast
 opencast_postgresql_database: opencast
 opencast_postgresql_connection_hosts:

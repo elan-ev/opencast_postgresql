@@ -1,5 +1,12 @@
 ---
-- name: restart postgresql
-  service:
-    name: postgresql
-    state: restarted
+- name: Restart Postgresql On CentOS
+  ansible.builtin.service:
+   name: "postgresql-{{ opencast_postgresql_version }}"
+   state: restarted
+  when: ansible_os_family == "RedHat"
+
+- name: Restart Postgresql On Debian/Ubuntu
+  ansible.builtin.service:
+   name: postgresql
+   state: restarted
+  when: ansible_os_family == "Debian"
