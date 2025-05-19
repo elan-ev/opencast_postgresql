@@ -1,13 +1,16 @@
 Ansible: Opencast PostgreSQL Role
 =================================
 
-This Ansible role installs and prepares a PostgreSQL database server for Opencast.
+[![lint](https://github.com/elan-ev/opencast_postgresql/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/elan-ev/opencast_postgresql/actions/workflows/lint.yml?branch=main)
+[![molecule](https://github.com/elan-ev/opencast_postgresql/actions/workflows/molecule.yml/badge.svg?branch=main)](https://github.com/elan-ev/opencast_postgresql/actions/workflows/molecule.yml?branch=main)
+
+This Ansible role installs a PostgreSQL database server.
 
 
 Dependencies
 ------------
 
-This role requires the PostgreSQL community collection:
+This role requires the PostgreSQL Ansible community collection:
 
 ```
 ansible-galaxy collection install community.postgresql
@@ -18,7 +21,7 @@ Role Variables
 --------------
 
 - `opencast_postgresql_version`
-	- PostgreSQL major version to install (default: `12`)
+	- PostgreSQL major version to install (default: `16`)
 	- Enables CentOS AppStream
 - `opencast_postgresql_user:`
 	- Database user to create (default: `opencast`)
