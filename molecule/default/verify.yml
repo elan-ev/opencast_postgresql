@@ -39,3 +39,34 @@
       ansible.builtin.debug:
         msg: "PostgreSQL version on {{ inventory_hostname }} (Debian): {{ psql_version_debian.stdout }}"
       when: ansible_os_family == "Debian"
+
+    - name: Find configuration file
+      ansible.builtin.set_fact:
+        config_file_dir: "{{ paths[ansible_os_family] }}"
+      vars:
+        paths:
+          RedHat: "/var/lib/pgsql/{{ opencast_postgresql_version }}/data"
+          Debian: "/etc/postgresql/{{ opencast_postgresql_version }}/main"
+
+    - name: Read configuration file
+      ansible.builtin.slurp:
+        src: "{{ config_file_dir }}/postgresql.conf"
+      register: config_file
+
+    - name: Test config set
+      ansible.builtin.assert:
+        that:
+          - '"listen_addresses = ''*''" in (config_file.content | b64decode)'
+          - '"max_connections = 1000" in (config_file.content | b64decode)'
+          - '"log_destination = ''syslog''" in (config_file.content | b64decode)'
+
+    - name: Read pg_hba.conf configuration file
+      ansible.builtin.slurp:
+        src: "{{ config_file_dir }}/pg_hba.conf"
+      register: hba_config_file
+
+    - name: Test config set
+      ansible.builtin.assert:
+        that:
+          - '"host    all             all             127.0.0.1/32            scram-sha-256" in (hba_config_file.content | b64decode)'
+          - '"host    all             all             10.10.10.1/24            scram-sha-256" in (hba_config_file.content | b64decode)'

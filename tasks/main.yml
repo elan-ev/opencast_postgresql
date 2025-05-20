@@ -50,6 +50,23 @@
   notify: Restart Postgresql On CentOS
   when: ansible_os_family == "RedHat"
 
+- name: Set listen_addresses (CentOS/RHEL)
+  ansible.builtin.lineinfile:
+    path: "/var/lib/pgsql/{{ opencast_postgresql_version }}/data/postgresql.conf"
+    regexp: '#?\s*listen_addresses\s*='
+    line: "listen_addresses = '{{ opencast_postgresql_listen_addresses | join(', ') }}'"
+  notify: Restart Postgresql On CentOS
+  when: ansible_os_family == "RedHat"
+
+- name: Set extra configs (CentOS/RHEL)
+  ansible.builtin.lineinfile:
+    path: "/var/lib/pgsql/{{ opencast_postgresql_version }}/data/postgresql.conf"
+    regexp: '#?\s*{{ item.key }}\s*='
+    line: "{{ item.key }} = {{ item.value }}"
+  loop: "{{ opencast_postgresql_extra_configs | dict2items }}"
+  notify: Restart Postgresql On CentOS
+  when: ansible_os_family == "RedHat"
+
 - name: Start and enable PostgreSQL (CentOS/RHEL)
   ansible.builtin.service:
     name: "postgresql-{{ opencast_postgresql_version }}"
@@ -116,6 +133,23 @@
     owner: postgres
     group: postgres
     mode: "0644"
+  notify: Restart Postgresql On Debian/Ubuntu
+  when: ansible_os_family == "Debian"
+
+- name: Set listen_addresses (Debian/Ubuntu)
+  ansible.builtin.lineinfile:
+    path: "/etc/postgresql/{{ opencast_postgresql_version }}/main/postgresql.conf"
+    regexp: '#?\s*listen_addresses\s*='
+    line: "listen_addresses = '{{ opencast_postgresql_listen_addresses | join(', ') }}'"
+  notify: Restart Postgresql On Debian/Ubuntu
+  when: ansible_os_family == "Debian"
+
+- name: Set extra configs (Debian/Ubuntu)
+  ansible.builtin.lineinfile:
+    path: "/etc/postgresql/{{ opencast_postgresql_version }}/main/postgresql.conf"
+    regexp: '#?\s*{{ item.key }}\s*='
+    line: "{{ item.key }} = {{ item.value }}"
+  loop: "{{ opencast_postgresql_extra_configs | dict2items }}"
   notify: Restart Postgresql On Debian/Ubuntu
   when: ansible_os_family == "Debian"
 
