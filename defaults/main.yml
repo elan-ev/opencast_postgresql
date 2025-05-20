@@ -3,6 +3,9 @@
 opencast_postgresql_version: 16
 opencast_postgresql_user: opencast
 opencast_postgresql_database: opencast
+opencast_postgresql_listen_addresses:
+  - "localhost"
 opencast_postgresql_connection_hosts:
   - 127.0.0.1/32
   - ::1/128
+opencast_postgresql_extra_configs: {}

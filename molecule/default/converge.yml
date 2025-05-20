@@ -1,7 +1,16 @@
 ---
+
 - name: Converge
   hosts: all
-  tasks:
-    - name: "Include opencast_postgresql"
-      ansible.builtin.include_role:
-        name: elan.opencast_postgresql
+  roles:
+    - role: elan.opencast_postgresql
+      opencast_postgresql_password: secret
+      opencast_postgresql_extra_configs:
+        max_connections: 1000        # Increase value for production use
+        log_destination: "'syslog'"  # Log to syslog
+      opencast_postgresql_listen_addresses:
+        - "*"                        # Listen on all IP addresses
+      opencast_postgresql_connection_hosts:
+        - "127.0.0.1/32"
+        - "::1/128"
+        - "10.10.10.1/24"            # Clients IP range
