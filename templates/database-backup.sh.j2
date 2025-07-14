@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+# DATABASE="{{ opencast_postgresql_database }}"
+DBUSER="{{ database_backup_owner }}"
+OUTDIR="{{ database_backup_output_path }}"
+KEEP={{ database_backup_keep }}
+DBS=( {{ database_backup_dbs | join(" ") }} )
+TS=$(date +%Y%m%d-%H%M%S)
+
+# Export PostgreSQL password so pg_dump doesn't prompt
+export PGPASSWORD="{{opencast_postgresql_password}}"
+
+# Loop through each database name
+for DB in "${DBS[@]}"; do
+  echo "Backing up $DB → $OUTDIR/db-backup-${DB}-${TS}.dump.gz"
+
+  # Run pg_dump and compress into a .gz file
+  pg_dump -F c "$DB" \
+    | gzip > "${OUTDIR}/db-backup-${DB}-${TS}.dump.gz"
+
+  # Remove older dumps, keep only the newest $KEEP
+  ls -1t "${OUTDIR}/db-backup-${DB}-"*.dump.gz \
+    | tail -n +$((KEEP + 1)) \
+    | xargs -r rm --
+done
