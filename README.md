@@ -18,10 +18,10 @@ Role Variables
 --------------
 
 - `opencast_postgresql_version`
-	- PostgreSQL major version to install (default: `12`)
+	- PostgreSQL major version to install (default: `16`)
 	- Enables CentOS AppStream
 - `opencast_postgresql_user:`
-	- Database user to create (default: `opencast`)
+	- Database user to create (default: `postgres`)
 - `opencast_postgresql_password`
 	- Databse password for user (_required_)
 - `opencast_postgresql_database`

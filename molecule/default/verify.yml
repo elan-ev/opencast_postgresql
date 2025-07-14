@@ -1,11 +1,14 @@
 ---
-- name: Verify PostgreSQL Installation
+- name: Verify PostgreSQL & Backup Configuration
   hosts: all
   gather_facts: true
   vars_files:
     - ../../defaults/main.yml
 
   tasks:
+    # ───────────────────────────────────────────────────────────
+    # Basic PostgreSQL installation
+    # ───────────────────────────────────────────────────────────
     - name: Ensure PostgreSQL service is running on RedHat/CentOS
       ansible.builtin.systemd:
         name: "postgresql-{{ opencast_postgresql_version }}"
@@ -39,3 +42,57 @@
       ansible.builtin.debug:
         msg: "PostgreSQL version on {{ inventory_hostname }} (Debian): {{ psql_version_debian.stdout }}"
       when: ansible_os_family == "Debian"
+
+    # ───────────────────────────────────────────────────────────
+    # Backup configuration (only when enabled)
+    # ───────────────────────────────────────────────────────────
+    - name: Verify backup configuration when enabled
+      when: database_backup_enabled | default(false)
+      block:
+        - name: Assert backups are enabled
+          ansible.builtin.assert:
+            that:
+              - database_backup_enabled | default(false)
+            fail_msg: "Backups are disabled; skipping backup verification."
+
+        - name: Ensure backup directory exists
+          ansible.builtin.stat:
+            path: "{{ database_backup_output_path }}"
+          register: backup_dir_stat
+
+        - name: Assert backup directory is present and writable
+          ansible.builtin.assert:
+            that:
+              - backup_dir_stat.stat.exists
+              - backup_dir_stat.stat.isdir
+            fail_msg: >
+              Backup directory {{ database_backup_output_path }}
+              is missing or not a directory.
+
+        - name: Check database-backup.service is installed and enabled
+          ansible.builtin.systemd:
+            name: database-backup.service
+            enabled: true
+            state: started
+
+        - name: Check database-backup.timer is installed and enabled
+          ansible.builtin.systemd:
+            name: database-backup.timer
+            enabled: true
+            state: started
+
+        - name: Slurp timer unit file for inspection
+          ansible.builtin.slurp:
+            path: /etc/systemd/system/database-backup.timer
+          register: timer_unit
+
+        - name: Assert OnCalendar line in timer unit matches schedule
+          ansible.builtin.assert:
+            that:
+              - "'OnCalendar={{ database_backup_schedule }}' in (timer_unit.content | b64decode)"
+            fail_msg: >
+              database-backup.timer does not contain
+              OnCalendar={{ database_backup_schedule }}.
+            success_msg: >
+              Timer unit file correctly contains
+              OnCalendar={{ database_backup_schedule }}.

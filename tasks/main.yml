@@ -1,7 +1,4 @@
 ---
-###############################################################################
-# CentOS / RHEL
-###############################################################################
 
 - name: Install PostgreSQL PGDG repository (CentOS/RHEL)
   ansible.builtin.dnf:
@@ -145,3 +142,10 @@
   community.postgresql.postgresql_db:
     name: "{{ opencast_postgresql_database }}"
     owner: "{{ opencast_postgresql_user }}"
+
+###############################################################################
+# database backup
+###############################################################################
+- name: Include backup setup tasks
+  ansible.builtin.include_tasks: backup.yml
+  when: database_backup_enabled
