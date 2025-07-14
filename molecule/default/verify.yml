@@ -45,7 +45,8 @@
     # ───────────────────────────────────────────────────────────
     # Backup configuration (only when enabled)
     # ───────────────────────────────────────────────────────────
-    - block:
+    -  name: Verify backup configuration when enabled
+       block:
         - name: Assert backups are enabled
           ansible.builtin.assert:
             that:
@@ -94,4 +95,4 @@
               Timer unit file correctly contains
               OnCalendar={{ database_backup_schedule }}.
 
-      when: database_backup_enabled | default(false)
+       when: database_backup_enabled | default(false)
