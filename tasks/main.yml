@@ -1,18 +1,4 @@
 ---
-###############################################################################
-# CentOS / RHEL
-###############################################################################
-# ── CentOS Stream 9 has frequent mirrorlist outages in CI ──────────────
-# - name: CentOS-Stream | pin baseos/appstream/extras to vault.centos.org
-#   ansible.builtin.shell: |
-#     dnf -y config-manager \
-#         --setopt={{ item }}.baseurl=https://vault.centos.org/9-stream/{{ item }}/$basearch/os \
-#         --setopt={{ item }}.mirrorlist= \
-#         --save
-#   loop: [ baseos, appstream, extras ]
-#   when: ansible_distribution == "CentOS Stream"
-#   changed_when: false            # idempotent, no facts modified
-# # ───────────────────────────────────────────────────────────────────────
 
 - name: Install PostgreSQL PGDG repository (CentOS/RHEL)
   ansible.builtin.dnf:

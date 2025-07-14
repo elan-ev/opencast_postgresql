@@ -10,7 +10,7 @@ opencast_postgresql_connection_hosts:
 # === Database backup feature (disabled by default) ===
 
 database_backup_enabled: false
-database_backup_output_path: None      # e.g. /var/backups/postgresql
+database_backup_output_path: None      
 database_backup_schedule: "*-*-* 05:00:00"  # Systemd OnCalendar format
 database_backup_keep: 7               # number of dumps to retain per DB
 database_backup_dbs: []               # list of database names to dump
