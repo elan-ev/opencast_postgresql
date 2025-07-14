@@ -19,3 +19,4 @@ jobs:
       - run: yamllint --strict -c .yamllint .
 
       - run: ansible-lint
+

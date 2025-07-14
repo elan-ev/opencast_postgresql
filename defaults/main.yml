@@ -1,5 +1,4 @@
 ---
-
 opencast_postgresql_version: 16
 opencast_postgresql_user: postgres
 opencast_postgresql_database: opencast
@@ -8,11 +7,10 @@ opencast_postgresql_connection_hosts:
   - ::1/128
 
 # === Database backup feature (disabled by default) ===
-
 database_backup_enabled: false
-database_backup_output_path: None      
+database_backup_output_path: None
 database_backup_schedule: "*-*-* 05:00:00"  # Systemd OnCalendar format
-database_backup_keep: 7               # number of dumps to retain per DB
-database_backup_dbs: []               # list of database names to dump
+database_backup_keep: 7
+database_backup_dbs: []
 database_backup_owner: postgres
 database_backup_group: postgres
