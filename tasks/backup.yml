@@ -21,27 +21,27 @@
   become_method: ansible.builtin.su
   when: database_backup_enabled
   block:
-  - name: Create Database User
-    community.postgresql.postgresql_user:
-      name: "{{ database_backup_user }}"
-      password: "{{ database_backup_user_password }}"
-      role_attr_flags: "NOSUPERUSER,NOCREATEDB"
+    - name: Create Database User
+      community.postgresql.postgresql_user:
+        name: "{{ database_backup_user }}"
+        password: "{{ database_backup_user_password }}"
+        role_attr_flags: "NOSUPERUSER,NOCREATEDB"
 
-  - name: Grant User CONNECT permission to the database
-    community.postgresql.postgresql_privs:
-      db: "{{ item }}"
-      role: "{{ database_backup_user }}"
-      objs: "{{ item }}"
-      type: database
-      privs: CONNECT
-    loop: "{{ database_backup_dbs }}"
+    - name: Grant User CONNECT permission to the database
+      community.postgresql.postgresql_privs:
+        db: "{{ item }}"
+        role: "{{ database_backup_user }}"
+        objs: "{{ item }}"
+        type: database
+        privs: CONNECT
+      loop: "{{ database_backup_dbs }}"
 
-  - name: Grant User read-only access to all data
-    community.postgresql.postgresql_membership:
-      group: pg_read_all_data
-      target_roles: "{{ database_backup_user }}"
-      state: present
-    when: database_backup_enabled
+    - name: Grant User read-only access to all data
+      community.postgresql.postgresql_membership:
+        group: pg_read_all_data
+        target_roles: "{{ database_backup_user }}"
+        state: present
+      when: database_backup_enabled
 
 - name: Ensure backup output directory exists
   ansible.builtin.file:
