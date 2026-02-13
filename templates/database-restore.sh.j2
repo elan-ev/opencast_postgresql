@@ -1,0 +1,47 @@
+#!/bin/bash
+set -o pipefail
+
+# Usage: ./database-restore.sh <database_name> <backup_file>
+
+DB_NAME=$1
+BACKUP_FILE=$2
+CORES=$(nproc)
+
+if [ -z "$DB_NAME" ] || [ -z "$BACKUP_FILE" ]; then
+  echo "Usage: $0 <database_name> <backup_file>"
+  exit 1
+fi
+
+if [ ! -f "$BACKUP_FILE" ]; then
+  echo "Error: Backup file $BACKUP_FILE does not exist."
+  exit 2
+fi
+
+# we don't use the backup user, because we need db creation rights
+export PGUSER="{{ opencast_postgresql_user }}"
+export PGPASSWORD="{{ opencast_postgresql_password }}"
+export PGHOST="localhost"
+
+echo "Restoring database $DB_NAME from $BACKUP_FILE..."
+
+# --force drops the DB even if there are active connections
+dropdb --if-exists --force "$DB_NAME"
+createdb "$DB_NAME"
+
+# Import the backup file
+# -j = number of parallel jobs, increases import speed
+pg_restore -j "$CORES" -d "$DB_NAME" -v "$BACKUP_FILE"
+
+RESULT=$?
+
+# Cleanup
+unset PGUSER
+unset PGPASSWORD
+unset PGHOST
+
+if [ $RESULT -eq 0 ]; then
+  echo "Restore completed successfully."
+else
+  echo "Restore failed."
+  exit 3
+fi
