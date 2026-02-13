@@ -26,12 +26,12 @@
     update_cache: true
   when: ansible_os_family == "RedHat"
 
-- name: Link PostgreSQL {{ opencast_postgresql_version }} binaries to system path
+- name: Link binaries to system path of PostgreSQL {{ opencast_postgresql_version }}
   ansible.builtin.file:
     src: "/usr/pgsql-{{ opencast_postgresql_version }}/bin/{{ item }}"
     dest: "/usr/bin/{{ item }}"
     state: link
-    force: yes
+    force: true
   loop:
     - psql
     - pg_dump
@@ -84,6 +84,8 @@
   when: ansible_os_family == "Debian"
 
 - name: Install PostgreSQL Repository (Debian/Ubuntu)
+  when: ansible_os_family == "Debian"
+  become: true
   block:
     - name: Ensure keyrings directory exists
       ansible.builtin.file:
@@ -103,9 +105,6 @@
         state: present
         filename: postgresql
       register: add_postgres_repo
-  when: ansible_os_family == "Debian"
-  become: true
-
 
 - name: Update apt cache when repo added (Debian/Ubuntu)
   ansible.builtin.apt:
@@ -123,12 +122,12 @@
     update_cache: true
   when: ansible_os_family == "Debian"
 
-- name: Link PostgreSQL {{ opencast_postgresql_version }} binaries to system path
+- name: Link binaries to system path of PostgreSQL {{ opencast_postgresql_version }}
   ansible.builtin.file:
     src: "/usr/lib/postgresql/{{ opencast_postgresql_version }}/bin/{{ item }}"
     dest: "/usr/bin/{{ item }}"
     state: link
-    force: yes
+    force: true
   loop:
     - psql
     - pg_dump
