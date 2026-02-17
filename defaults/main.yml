@@ -6,3 +6,15 @@ opencast_postgresql_database: opencast
 opencast_postgresql_connection_hosts:
   - 127.0.0.1/32
   - ::1/128
+
+# === Database backup feature (disabled by default) ===
+database_backup_enabled: false
+database_backup_output_path: ""
+database_backup_schedule: "*-*-* 05:00:00"   # Systemd OnCalendar format
+database_backup_keep: 7
+# list of databases
+database_backup_dbs:
+  - "{{ opencast_postgresql_database }}"
+database_backup_owner: postgres
+database_backup_group: postgres
+database_backup_user: backup

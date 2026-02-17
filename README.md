@@ -17,17 +17,42 @@ ansible-galaxy collection install community.postgresql
 Role Variables
 --------------
 
+#### Variables for installing the Database
 - `opencast_postgresql_version`
-	- PostgreSQL major version to install (default: `12`)
+	- PostgreSQL major version to install (default: `16`)
 	- Enables CentOS AppStream
-- `opencast_postgresql_user:`
+- `opencast_postgresql_user`
 	- Database user to create (default: `opencast`)
 - `opencast_postgresql_password`
-	- Databse password for user (_required_)
+	- Database password for user (_required_)
 - `opencast_postgresql_database`
 	- Database name (default: `opencast`)
 - `opencast_postgresql_connection_hosts`
 	- List of hosts allowed to connect to database (default: `[127.0.0.1/32, ::1/128]`)
+
+#### (Optional) Variables for configuring automated Database Backups
+- `database_backup_enabled`
+  - Activate database backups (default: `false`)
+- `database_backup_output_path`
+  - Directory for the the backup files (default: `""`)
+  - _**required**_ when backups are enabled
+- `database_backup_schedule`
+  - Schedule for the backup creation (default: `*-*-* 05:00:00`)
+  - Uses Systemd OnCalendar format
+- `database_backup_keep`
+  - How many backups to keep, oldest will be cleaned up (default: `7`)
+- `database_backup_dbs`
+  - define which PostgreSQL databases should be backuped (default: `{{ opencast_postgresql_database }}`)
+  - Expects a list of database names, but always adds at least the `{{ opencast_postgresql_database }}`
+- `database_backup_owner`
+  - OS owner of the backup directory and files (default: `postgres`)
+- `database_backup_group`
+  - OS group of the backup directory and files (default: `postgres`)
+- `database_backup_user`
+  - Name of the DB User that runs pg_dump (default: `backup`)
+
+
+  
 
 
 Example Playbook

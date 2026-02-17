@@ -1,7 +1,14 @@
 ---
 - name: Converge
   hosts: all
+  vars:
+    opencast_postgresql_password: "1234"
+    database_backup_user_password: "4321"
+    database_backup_enabled: true
+    database_backup_output_path: "/var/tmp/db_backups"
+    database_backup_schedule: "*-*-* *:*:00"   # Systemd OnCalendar format
+    database_backup_keep: 4
   tasks:
-    - name: "Include opencast_postgresql"
+    - name: Include opencast_postgresql
       ansible.builtin.include_role:
         name: elan.opencast_postgresql

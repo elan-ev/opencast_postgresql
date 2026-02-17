@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+DBUSER="{{ database_backup_user }}"
+DBPASS="{{ database_backup_user_password }}"
+OUTDIR="{{ database_backup_output_path }}"
+KEEP={{ database_backup_keep }}
+DBS=({{ database_backup_dbs | join(' ') }})
+TS=$(date +%Y%m%d-%H%M%S)
+
+# Export PostgreSQL password so pg_dump doesn't prompt
+export PGPASSWORD="{{opencast_postgresql_password}}"
+
+# Loop through each database name
+for DB in "${DBS[@]}"; do
+  echo "Backing up $DB → $OUTDIR/db-backup-${DB}-${TS}.dump"
+
+  # Run pg_dump and use -Fc to compress the file
+  pg_dump -Fc -d "$DB" -f "${OUTDIR}/db-backup-${DB}-${TS}.dump"
+
+  # Remove older dumps, keep only the newest $KEEP
+  ls -1t "${OUTDIR}/db-backup-${DB}-"*.dump \
+    | tail -n +$((KEEP + 1)) \
+    | xargs -r rm --
+done

@@ -26,6 +26,19 @@
     update_cache: true
   when: ansible_os_family == "RedHat"
 
+- name: Link binaries to system path of PostgreSQL {{ opencast_postgresql_version }}
+  ansible.builtin.file:
+    src: "/usr/pgsql-{{ opencast_postgresql_version }}/bin/{{ item }}"
+    dest: "/usr/bin/{{ item }}"
+    state: link
+    force: true
+  loop:
+    - psql
+    - pg_dump
+    - pg_dumpall
+    - pg_restore
+  when: ansible_os_family == "RedHat"
+
 - name: Initialise PostgreSQL database (CentOS/RHEL)
   ansible.builtin.command:
     cmd: "/usr/pgsql-{{ opencast_postgresql_version }}/bin/postgresql-{{ opencast_postgresql_version }}-setup initdb"
@@ -70,20 +83,28 @@
     update_cache: true
   when: ansible_os_family == "Debian"
 
-- name: Add PostgreSQL GPG key (Debian/Ubuntu)
-  ansible.builtin.apt_key:
-    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
-    state: present
+- name: Install PostgreSQL Repository (Debian/Ubuntu)
   when: ansible_os_family == "Debian"
+  become: true
+  block:
+    - name: Ensure keyrings directory exists
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
 
-- name: Add PostgreSQL repository (Debian/Ubuntu)
-  ansible.builtin.apt_repository:
-    repo: >-
-      deb http://apt.postgresql.org/pub/repos/apt
-      {{ ansible_distribution_release }}-pgdg main
-    state: present
-  register: add_postgres_repo
-  when: ansible_os_family == "Debian"
+    - name: Download PostgreSQL GPG key
+      ansible.builtin.get_url:
+        url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+        dest: /etc/apt/keyrings/postgresql.asc
+        mode: '0644'
+
+    - name: Add PostgreSQL Repository
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/etc/apt/keyrings/postgresql.asc] http://apt.postgresql.org/pub/repos/apt {{ ansible_distribution_release }}-pgdg main"
+        state: present
+        filename: postgresql
+      register: add_postgres_repo
 
 - name: Update apt cache when repo added (Debian/Ubuntu)
   ansible.builtin.apt:
@@ -99,6 +120,19 @@
       - acl
     state: present
     update_cache: true
+  when: ansible_os_family == "Debian"
+
+- name: Link binaries to system path of PostgreSQL {{ opencast_postgresql_version }}
+  ansible.builtin.file:
+    src: "/usr/lib/postgresql/{{ opencast_postgresql_version }}/bin/{{ item }}"
+    dest: "/usr/bin/{{ item }}"
+    state: link
+    force: true
+  loop:
+    - psql
+    - pg_dump
+    - pg_dumpall
+    - pg_restore
   when: ansible_os_family == "Debian"
 
 - name: Set auth to scram-sha-256 in postgresql.conf (Debian/Ubuntu)
@@ -145,3 +179,10 @@
   community.postgresql.postgresql_db:
     name: "{{ opencast_postgresql_database }}"
     owner: "{{ opencast_postgresql_user }}"
+
+###############################################################################
+# database backup
+###############################################################################
+- name: Include backup setup tasks
+  ansible.builtin.include_tasks: backup.yml
+  when: database_backup_enabled
