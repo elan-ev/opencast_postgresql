@@ -26,6 +26,7 @@
         name: "{{ database_backup_user }}"
         password: "{{ database_backup_user_password }}"
         role_attr_flags: "NOSUPERUSER,NOCREATEDB"
+      no_log: true
 
     - name: Grant User CONNECT permission to the database
       community.postgresql.postgresql_privs:
@@ -41,7 +42,6 @@
         group: pg_read_all_data
         target_roles: "{{ database_backup_user }}"
         state: present
-      when: database_backup_enabled
 
 - name: Ensure backup output directory exists
   ansible.builtin.file:
